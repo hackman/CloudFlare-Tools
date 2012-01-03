@@ -21,7 +21,7 @@
  * CloudFlareIPHeader CF-Connecting-IP
  * CloudFlareIPTrustedProxy 204.93.173.0/24
  *
- * Version 1.0.2
+ * Version 1.0.3
  */
 
 #include "ap_config.h"
@@ -491,7 +491,8 @@ static void register_hooks(apr_pool_t *p)
 {
     // We need to run very early so as to not trip up mod_security. 
     // Hence, this little trick, as mod_security runs at APR_HOOK_REALLY_FIRST.
-    ap_hook_post_read_request(cloudflare_modify_connection, NULL, NULL, APR_HOOK_REALLY_FIRST - 10);
+	static const char * const loadPost[] = { "mod_security.c", NULL };
+    ap_hook_post_read_request(cloudflare_modify_connection, NULL, loadPost, APR_HOOK_REALLY_FIRST);
 }
 
 module AP_MODULE_DECLARE_DATA cloudflare_module = {
